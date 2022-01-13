@@ -5,10 +5,10 @@ namespace game
 {
     public class GameController
     {
-        private const int _MapRange = 100;
+        private int _MapRange = 100;
         private readonly Player _player;
-
         private readonly List<GameRules> _bots = new List<GameRules>();
+
         public GameController(Player player)
         {
             _player = player;
@@ -20,6 +20,10 @@ namespace game
             if (Fight())
             {
                 Console.WriteLine("Queen saved.");
+            }
+            else
+            {
+                Console.WriteLine("You Lose!");
             }
         }
 
@@ -63,31 +67,19 @@ namespace game
                             Console.WriteLine($"{_bots[i].GetType().Name} HP {_bots[i].Hp}");
                             Console.WriteLine($"Player HP {_player.Hp}");
 
+                            if (_player.Hp <= 0)
+                            {
+                                Console.WriteLine("Player Dies");
+                                _player.IsAlive = false;
+                                return false;
+                            }
+
                             if (_bots[i].Hp <= 0)
                             {
                                 Console.WriteLine($"{_bots[i].GetType().Name} dead");
                                 _bots[i].IsAlive = false;
                                 _player.position = 0;
-                                if (Heal() && _player.Hp + 10 <= 100)
-                                {
-                                    if (_player.Hp + 10 > 100)
-                                    {
-                                        _player.Hp = 100;
-                                        Console.WriteLine("Player is full hp");
-                                    }
-                                    else
-                                    {
-                                        Console.WriteLine("Healed +10hp");
-                                        _player.Hp += 10;
-                                    }
-                                }
-                            }
-
-                            if (_player.Hp <= 0)
-                            {
-                                Console.WriteLine("Player Dies");
-                                _player.IsAlive = false;
-                                break;
+                                Heal();
                             }
                         }
                         continue;
@@ -98,31 +90,27 @@ namespace game
                         _player.Hp -= _bots[i].Damage;
                     }
                 }
-
-                if (_player.IsAlive == false)
-                {
-                    Console.WriteLine("you lose");
-                    break;
-                }
-
             }
-
-            if (_player.IsAlive)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return true;
         }
 
-        private bool Heal()
+        private void Heal()
         {
-            Random gen = new Random();
-            int prob = gen.Next(100);
-            return prob <= 40;
-        }
+            Random r = new Random(); //40% chance to heal
 
+            if (r.Next(100) <= 40 && _player.Hp + 10 <= 100)
+            {
+                if (_player.Hp + 10 > 100)
+                {
+                    _player.Hp = 100;
+                    Console.WriteLine("Player is full hp");
+                }
+                else
+                {
+                    Console.WriteLine("Healed +10hp");
+                    _player.Hp += 10;
+                }
+            }
+        }
     }
 }
