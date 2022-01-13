@@ -5,7 +5,7 @@ namespace game
 {
     public class GameController
     {
-        private int _MapRange = 100;
+        private const int MapRange = 100;
         private readonly Player _player;
         private readonly List<GameRules> _bots = new List<GameRules>();
 
@@ -17,31 +17,42 @@ namespace game
 
         public void Run()
         {
-            if (Fight())
-            {
-                Console.WriteLine("Queen saved.");
-            }
-            else
-            {
-                Console.WriteLine("You Lose!");
-            }
+            Console.WriteLine(Fight() ? "Queen saved." : "You Lose!");
         }
 
 
         private void GenerateBots()
         {
-            for (int i = 0; i < _MapRange / 10; i++)
+            for (var i = 0; i < MapRange / 10; i++)
             {
-                Random r = new Random();
-                int prob = r.Next(100);
+                Random r = new();
 
-                if (prob <= 50)
+                if (r.Next(100) <= 50)
                 {
                     _bots.Add(new Archer());
                 }
                 else
                 {
                     _bots.Add(new Samurai());
+                }
+            }
+        }
+
+        private void Heal()
+        {
+            var r = new Random(); //40% chance to heal
+
+            if (r.Next(100) <= 40 && _player.Hp + 10 <= 100)
+            {
+                if (_player.Hp + 10 >= 100)
+                {
+                    _player.Hp = 100;
+                    Console.WriteLine("Player is full hp");
+                }
+                else
+                {
+                    Console.WriteLine("Healed +10hp");
+                    _player.Hp += 10;
                 }
             }
         }
@@ -92,25 +103,6 @@ namespace game
                 }
             }
             return true;
-        }
-
-        private void Heal()
-        {
-            Random r = new Random(); //40% chance to heal
-
-            if (r.Next(100) <= 40 && _player.Hp + 10 <= 100)
-            {
-                if (_player.Hp + 10 > 100)
-                {
-                    _player.Hp = 100;
-                    Console.WriteLine("Player is full hp");
-                }
-                else
-                {
-                    Console.WriteLine("Healed +10hp");
-                    _player.Hp += 10;
-                }
-            }
         }
     }
 }
